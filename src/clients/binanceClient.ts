@@ -1,20 +1,17 @@
-import Binance from 'binance-api-node';
-import dotenv from 'dotenv';
+import Binance, {OrderSide} from 'binance-api-node';
+import {OrderType} from "binance-api-node/types/base";
 
-// Cargar variables de entorno
-dotenv.config();
-
-/**
- * Cliente de Binance para interactuar con la API
- */
+type BinanceClientConfig = {
+  apiKey: string
+  apiSecret: string
+}
 export class BinanceClient {
   private client: ReturnType<typeof Binance>;
 
-  constructor() {
-    // Inicializar el cliente con las credenciales de API
+  constructor(config: BinanceClientConfig) {
     this.client = Binance({
-      apiKey: process.env.BINANCE_API_KEY || '',
-      apiSecret: process.env.BINANCE_API_SECRET || '',
+      apiKey: config.apiKey,
+      apiSecret: config.apiSecret,
     });
   }
 
@@ -90,5 +87,25 @@ export class BinanceClient {
       console.error(`Error al obtener libro de órdenes de ${symbol}:`, error);
       throw error;
     }
+  }
+
+  async buy(symbol: string, quoteOrderQty: number): Promise<number> {
+    const order =  await this.client.order({
+      symbol,
+      side: OrderSide.BUY,
+      type: OrderType.MARKET,
+      quoteOrderQty: quoteOrderQty.toString(),
+    });
+    return order.orderId
+  }
+
+  async sell(symbol: string, quantity: number): Promise<number> {
+    const order = await this.client.order({
+      symbol,
+      side: OrderSide.SELL,
+      type: OrderType.MARKET,
+      quantity: quantity.toString(),
+    });
+    return order.orderId
   }
 }

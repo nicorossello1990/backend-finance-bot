@@ -1,13 +1,15 @@
-import { BinanceClient } from './binanceClient';
+import {binanceClient} from "./clients";
+import {Account, AssetBalance} from "binance-api-node";
+
+const PAIR: string = 'ADAUSDT';     // Par a operar
+const ASSET: string = 'ADA';        // La moneda que compramos
+const INVERSION_USDT: number = 15;  // Monto a invertir (USDT)
 
 /**
  * Función principal para demostrar el uso del cliente de Binance
  */
 async function main() {
   console.log('🚀 Iniciando Backend Finance Bot...\n');
-
-  // Crear instancia del cliente de Binance
-  const binanceClient = new BinanceClient();
 
   // Probar la conexión
   console.log('📡 Probando conexión con Binance...');
@@ -33,22 +35,51 @@ async function main() {
     const bnbPrice = await binanceClient.getPrice('BNBUSDT');
     console.log(`Binance Coin (BNB/USDT): $${bnbPrice}`);
 
-    console.log('\n📖 Obteniendo libro de órdenes de BTC/USDT...');
-    const orderBook = await binanceClient.getOrderBook('BTCUSDT', 5);
-    console.log('Mejores 5 ofertas de compra (bids):');
-    orderBook.bids.slice(0, 5).forEach((bid, index) => {
-      console.log(`  ${index + 1}. Precio: $${bid[0]}, Cantidad: ${bid[1]}`);
-    });
-    console.log('Mejores 5 ofertas de venta (asks):');
-    orderBook.asks.slice(0, 5).forEach((ask, index) => {
-      console.log(`  ${index + 1}. Precio: $${ask[0]}, Cantidad: ${ask[1]}`);
-    });
-
     console.log('\n✅ Demostración completada exitosamente!');
+
+    console.log(`\n1️⃣  Ejecutando COMPRA de mercado...`);
+
+    const orderId = await binanceClient.buy(PAIR, INVERSION_USDT)
+
+    console.log(`✅ Compra enviada. ID: ${orderId}`);
+
+    // a) Consultar saldo real
+    const infoCuenta: Account = await binanceClient.getAccountInfo();
+    const balance: AssetBalance | undefined = infoCuenta.balances.find((b: AssetBalance) => b.asset === ASSET);
+
+    if (!balance) {
+      throw new Error(`No se encontró balance para el activo ${ASSET}`);
+    }
+
+    const quantity: number = parseFloat(balance.free);
+    console.log(`💰 Saldo disponible: ${quantity} ${ASSET}`);
+
+    if (quantity === 0) {
+      console.error(`❌ Error: No hay saldo de ${ASSET} para vender.`);
+      return;
+    }
+
+    // b) Ajuste de decimales (Truco de seguridad)
+    // Binance suele rechazar órdenes con demasiados decimales (Lot Size Filter).
+    // ADA suele aceptar 1 o 2 decimales. Redondeamos hacia abajo a 2 decimales.
+    const cantidadAVender: string = (Math.floor(quantity * 100) / 100).toFixed(2);
+
+    const numberQuantity = parseFloat(cantidadAVender)
+    if (numberQuantity <= 0) {
+      console.error("❌ La cantidad es muy pequeña para vender después de redondear.");
+      return;
+    }
+
+    console.log(`2️⃣  Ejecutando VENTA de ${cantidadAVender} ${ASSET}...`);
+
+    const orderIdSell = await binanceClient.sell(PAIR, numberQuantity)
+
+    console.log(`✅ Venta Exitosa! ID: ${orderIdSell}`);
+    console.log(`🏁 Bot finalizado correctamente.`);
+
   } catch (error) {
     console.error('\n❌ Error durante la ejecución:', error);
   }
 }
 
-// Ejecutar la función principal
 main().catch(console.error);
