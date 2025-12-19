@@ -16,13 +16,6 @@ export class BinanceClient {
   }
 
   /**
-   * Obtener el cliente de Binance
-   */
-  getClient() {
-    return this.client;
-  }
-
-  /**
    * Verificar la conexión con Binance obteniendo el tiempo del servidor
    */
   async testConnection(): Promise<boolean> {
@@ -34,19 +27,6 @@ export class BinanceClient {
     } catch (error) {
       console.error('❌ Error al conectar con Binance:', error);
       return false;
-    }
-  }
-
-  /**
-   * Obtener información de precios de todos los símbolos
-   */
-  async getPrices() {
-    try {
-      const prices = await this.client.prices();
-      return prices;
-    } catch (error) {
-      console.error('Error al obtener precios:', error);
-      throw error;
     }
   }
 
@@ -72,19 +52,6 @@ export class BinanceClient {
       return result.price;
     } catch (error) {
       console.error(`Error al obtener precio de ${symbol}:`, error);
-      throw error;
-    }
-  }
-
-  /**
-   * Obtener información del libro de órdenes para un símbolo
-   */
-  async getOrderBook(symbol: string, limit: number = 10) {
-    try {
-      const orderBook = await this.client.book({ symbol, limit });
-      return orderBook;
-    } catch (error) {
-      console.error(`Error al obtener libro de órdenes de ${symbol}:`, error);
       throw error;
     }
   }
