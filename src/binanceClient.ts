@@ -71,9 +71,8 @@ export class BinanceClient {
    */
   async getPrice(symbol: string): Promise<string> {
     try {
-      const prices = await this.client.prices();
-      const priceObj = prices.find(p => p.symbol === symbol);
-      return priceObj ? priceObj.price : '0';
+      const result = await this.client.tickerPrice({ symbol });
+      return result.price;
     } catch (error) {
       console.error(`Error al obtener precio de ${symbol}:`, error);
       throw error;
