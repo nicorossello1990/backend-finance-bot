@@ -14,11 +14,11 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^25.0.3",
+    "binance-api-node": "0.13.6",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "binance-api-node": "^0.13.6",
     "dotenv": "^17.2.3"
   }
 }

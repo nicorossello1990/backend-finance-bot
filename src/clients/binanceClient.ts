@@ -1,9 +1,9 @@
-import Binance, {OrderSide} from 'binance-api-node';
-import {OrderType} from "binance-api-node/types/base";
+import Binance, {OrderSide, OrderType} from 'binance-api-node';
 
 type BinanceClientConfig = {
   apiKey: string
   apiSecret: string
+  isDevMode: boolean
 }
 export class BinanceClient {
   private client: ReturnType<typeof Binance>;
@@ -12,6 +12,7 @@ export class BinanceClient {
     this.client = Binance({
       apiKey: config.apiKey,
       apiSecret: config.apiSecret,
+      ...(config.isDevMode && {httpBase: 'https://testnet.binance.vision'})
     });
   }
 
@@ -20,9 +21,8 @@ export class BinanceClient {
    */
   async testConnection(): Promise<boolean> {
     try {
-      const time = await this.client.time();
+      await this.client.time();
       console.log('✅ Conexión exitosa con Binance');
-      console.log('Hora del servidor:', new Date(time.serverTime).toISOString());
       return true;
     } catch (error) {
       console.error('❌ Error al conectar con Binance:', error);

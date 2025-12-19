@@ -22,9 +22,12 @@ async function main() {
   }
 
   console.log('\n📊 Obteniendo precios de algunos pares de criptomonedas...');
+  const account = await binanceClient.getAccountInfo()
+  const balance = account.balances.filter(b => +b.free >0)
+  console.log('Balances con fondos disponibles:', balance);
   try {
     // Obtener precio de Bitcoin
-    const btcPrice = await binanceClient.getPrice('BTCUSDT');
+/*    const btcPrice = await binanceClient.getPrice('BTCUSDT');
     console.log(`Bitcoin (BTC/USDT): $${btcPrice}`);
 
     // Obtener precio de Ethereum
@@ -33,11 +36,11 @@ async function main() {
 
     // Obtener precio de Binance Coin
     const bnbPrice = await binanceClient.getPrice('BNBUSDT');
-    console.log(`Binance Coin (BNB/USDT): $${bnbPrice}`);
+    console.log(`Binance Coin (BNB/USDT): $${bnbPrice}`);*/
 
     console.log('\n✅ Demostración completada exitosamente!');
 
-    console.log(`\n1️⃣  Ejecutando COMPRA de mercado...`);
+    /*console.log(`\n1️⃣  Ejecutando COMPRA de mercado...`);
 
     const orderId = await binanceClient.buy(PAIR, INVERSION_USDT)
 
@@ -75,7 +78,7 @@ async function main() {
     const orderIdSell = await binanceClient.sell(PAIR, numberQuantity)
 
     console.log(`✅ Venta Exitosa! ID: ${orderIdSell}`);
-    console.log(`🏁 Bot finalizado correctamente.`);
+    console.log(`🏁 Bot finalizado correctamente.`);*/
 
   } catch (error) {
     console.error('\n❌ Error durante la ejecución:', error);

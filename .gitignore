@@ -1,5 +1,9 @@
 # Dependency directories
 node_modules/
+
+# Dist directory
+dist
+
 # Optional npm cache directory
 .npm
 # dotenv environment variable files
@@ -7,3 +11,4 @@ node_modules/
 
 # Idea IDE files
 .idea/
+
